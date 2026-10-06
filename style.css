@@ -1,8 +1,118 @@
 body {
+
+    font-family: "Comic sans MS", cursive;
+    animation: bg 8s infinite alternate ease-in-out;
+    color: oklch(98% 0.02 80);
+}
+
+.divsplay {
+    margin-top: 35vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-    height: 90vh;
-    font-size: 5rem;
-    font-family: "Comic sans MS";
+    font-size: 8rem;
+    font-weight: 600;
+    background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+    color: transparent;
+    background-clip: text;
+    animation: textAnim 8s infinite alternate ease-in-out;
+    background-size: 600% auto;
+    /* text-shadow: -4px -2px #111f; */
+    filter: drop-shadow(6px 3px 0 #000b);
+}
+
+.divsplay span::selection {
+    background-color: #fff8;
+    color: black;
+}
+
+@keyframes textAnim {
+    0% {
+        background-position: 0 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes bg {
+    0% {
+        background: oklch(10% 0.05 336);
+    }
+
+    25% {
+        background: oklch(10% 0.05 264);
+    }
+
+    50% {
+        background: oklch(10% 0.05 150);
+    }
+
+    75% {
+        background: oklch(10% 0.05 108);
+    }
+
+    100% {
+        background: oklch(10% 0.05 20);
+        ;
+    }
+}
+
+.options__button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+    svg {
+        height: 80px;
+        width: 80px;
+
+        path {
+            animation: opt 8s infinite alternate ease-in-out;
+        }
+    }
+}
+
+.options__button:hover {
+    filter: drop-shadow(0 0 4px #fff8) drop-shadow(0 0 1px #fffa) brightness(1.5);
+}
+
+@keyframes opt {
+    0% {
+        stroke: oklch(75% 0.3 336);
+    }
+
+    25% {
+        stroke: oklch(50% 0.3 264);
+    }
+
+    50% {
+        stroke: oklch(75% 0.19 150);
+    }
+
+    75% {
+        stroke: oklch(75% 0.2 108);
+    }
+
+    100% {
+        stroke: oklch(75% 0.3 20);
+        ;
+    }
+}
+
+form {
+    width: clamp();
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    fieldset {
+        border-radius: 3px;
+        display: flex;
+        flex-direction: column;
+
+        legend {
+            font-size: 1.2rem;
+        }
+    }
 }

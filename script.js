@@ -32,13 +32,30 @@ function getNextBreak(breaks) {
     return next;
 }
 
-async function timer(nxt) {
+async function timerOLD(nxt) {
     const display = document.getElementById("display");
 
     while (true) {
         const diff = nxt - new Date();
         display.textContent = format(diff);
-        await new Promise(r => setTimeout(r, 200));
+        await new Promise(r => setTimeout(r, 50));
+    }
+}
+
+async function timer(nxt) {
+    const digits = document.querySelectorAll(".digit");
+
+    while (true) {
+        const diff = nxt - new Date();
+        let heure = format(diff);
+        heure = heure.replaceAll(":", "");
+        for (let i = 5; i >= 0; i--) {
+            if (digits[i].textContent != heure.substring(i, i + 1))
+                digits[i].textContent = heure.substring(i, i + 1);
+            else
+                break;
+        }
+        await new Promise(r => setTimeout(r, 1));
     }
 }
 
@@ -57,6 +74,8 @@ function format(time) {
     }
 
     return ftime.h + ":" + ftime.m + ":" + ftime.s;
+    // + "." + String(String(time).slice(-3, -1)).padStart(2, "0")
+
 }
 
 async function main() {
