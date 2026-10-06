@@ -1,50 +1,43 @@
-const pauses = ["10:15:00", "12:15:00", "15:00:00", "17:00:00"];
-let now = new Date();
-const year = now.getFullYear();
-const month = now.getMonth();
-const day = now.getDate();
-const breaks = [];
-const display = document.getElementById("display");
-let nextBreak
 
 async function init() {
-    pauses.forEach((p) => {
-        breaks.push(new Date(year, month, day, p.substring(0, 2), p.substring(3, 5)));
-    });
-
-
-    // fetch("schedule.json")
-    //     .then(res => res.json())
-    //     .then(json => { schedule = json });
-
     const response = await fetch("./schedule.json");
     const schedule = await response.json();
 
+    const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+    const today = days[(new Date()).getDay()];
+    const todayBreaks = schedule[today];
 
-    const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-    const jour = jours[now.getDay()];
-    console.log(schedule[jour])
+    for (const b in todayBreaks) {
+        todayBreaks[b] = toDateFormat(todayBreaks[b]);
+    }
 
+    return todayBreaks;
 }
 
-function getNextBreako() {
-
+function toDateFormat(time) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const day = now.getDate();
+    return new Date(year, month, day, time.substring(0, 2), time.substring(3, 5));
 }
 
-function getNexBreak() {
-    let i;
-    for (i = 0; (new Date()).getTime() > breaks[i].getTime(); i++) { };
-    console.log(i)
-    nextBreak = breaks[i];
+function getNextBreak(breaks) {
+    let next = Infinity;
+    const now = (new Date()).getTime();
+    for (const b in breaks) {
+        if (breaks[b].getTime() < next && breaks[b].getTime() > now)
+            next = b;
+    }
+    return next;
 }
 
-async function timer() {
+async function timer(nxt) {
+    const display = document.getElementById("display");
+
     while (true) {
-        const diff = nextBreak - new Date();
-
+        const diff = nxt - new Date();
         display.textContent = format(diff);
-        // console.log(format(diff))
-
         await new Promise(r => setTimeout(r, 200));
     }
 }
@@ -63,14 +56,14 @@ function format(time) {
         ftime[t] = String(ftime[t]).padStart(2, "0");
     }
 
-    let formatted = ftime.h + ":" + ftime.m + ":" + ftime.s;
-    return formatted;
+    return ftime.h + ":" + ftime.m + ":" + ftime.s;
 }
 
 async function main() {
-    await init();
-    getNexBreak();
-    timer();
+    const todayBreaks = await init();
+    let nextBreak = getNextBreak(todayBreaks);
+
+    timer(todayBreaks[nextBreak]);
 }
 
 main();
