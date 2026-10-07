@@ -1,7 +1,9 @@
 
 async function init() {
     const response = await fetch("./schedule.json");
-    const schedule = await response.json();
+    let schedule = await response.json();
+
+    schedule = applySettings(schedule);
 
     const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
     const today = days[(new Date()).getDay()];
@@ -12,6 +14,49 @@ async function init() {
     }
 
     return todayBreaks;
+}
+
+function applySettings(schedule) {
+    let settings = localStorage.getItem("settings") ?? null;
+    if (settings == null) return schedule
+    settings = JSON.parse(settings);
+
+    for (const setting in settings) {
+        switch (setting) {
+            case "sp_mon":
+                schedule.lundi.sport = "16:00";
+                break;
+            case "sp_wed":
+                schedule.mercredi.sport = "16:00";
+                break;
+            case "oth_16":
+                for (const day in schedule) schedule[day].fin = "16:00";
+                break;
+            case "en_n":
+                switch (settings.en_n) {
+                    case "1":
+                        schedule.mardi.anglais = "14:00";
+                        break;
+                    case "2":
+                        schedule.mardi.anglais = "15:00";
+                        schedule.mardi.pauseAprem = "14:45";
+                        break;
+                }
+                break;
+            case "en_c":
+                switch (settings.en_c) {
+                    case "1":
+                        schedule.jeudi.anglais = "08:30";
+                        break;
+                    case "2":
+                        schedule.jeudi.anglais = "10:30";
+                        break;
+                }
+                break;
+        }
+    }
+    console.log(schedule)
+    return schedule
 }
 
 function toDateFormat(time) {

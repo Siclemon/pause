@@ -6,60 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>options</title>
     <link rel="stylesheet" href="style.css">
-    <script src="./script.js" defer></script>
+    <script src="./options.js" defer></script>
 </head>
 
 <body>
-    <h1>Options</h1>
-
-    <a href="./index.html">retour</a>
-
-    <form action="">
-        <fieldset>
-            <legend>Sport</legend>
-            <label for="sp_mon">Lundi
-                <input type="checkbox" name="sp_mon" id="sp_mon">
-            </label>
-            <label for="sp_wed">Mercredi
-                <input type="checkbox" name="sp_wed" id="sp_wed">
-            </label>
-        </fieldset>
-        <fieldset>
-            <legend>Anglais 1</legend>
-            <label for="en_n_1">
-                Groupe 1
-                <input type="radio" name="en_n" value="1" id="en_n_1">
-            </label>
-            <label for="en_n_2">
-                Groupe 2
-                <input type="radio" name="en_n" value="2" id="en_n_2">
-            </label>
-            <label for="en_n_0">
-                Pas concerné·e
-                <input type="radio" name="en_n" value="0" id="en_n_0">
-            </label>
-        </fieldset>
-        <fieldset>
-            <legend>Anglais 2</legend>
-            <label for="en_c_1">
-                Groupe 1
-                <input type="radio" name="en_c" value="1" id="en_c_1">
-            </label>
-            <label for="en_c_2">
-                Groupe 2
-                <input type="radio" name="en_c" value="2" id="en_c_2">
-            </label>
-        </fieldset>
-        <fieldset>
-            <legend>Autre</legend>
-            <label for="oth_16">
-                Horaire aménagé (16h)
-                <input type="checkbox" name="oth_16" id="oth_16">
-            </label>
-        </fieldset>
-        <button type="reset">Reset</button>
-        <button type="button">Valider</button>
-    </form>
-</body>
-
-</html>
+    <main class="opt__main">
+        <h1>Options</h1>
+        <a href="./index.html">retour</a>
+        
+        <form action="">
+            <fieldset>
+                <legend>Sport</legend>
+                <label for="sp_mon">Lundi
+                    <input type="checkbox" name="sp_mon" id="sp_mon" value="true">
+                </label>
+                <label for="sp_wed">Mercredi
+                    <input type="checkbox" name="sp_wed" id="sp_wed" value="true">
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Anglais 1</legend>
+                <label for="en_n_1">
+                    Groupe 1
+                    <input type="radio" name="en_n" value="1" id="en_n_1">
+                </label>
+                <label for="en_n_2">
+                    Groupe 2
+                    <input type="radio" name="en_n" value="2" id="en_n_2">
+                </label>
+                <label for="en_n_0">
+                    Pas concerné·e
+                    <input type="radio" name="en_n" value="0" id="en_n_0">
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Anglais 2</legend>
+                <label for="en_c_1">
+                    Groupe 1
+                    <input type="radio" name="en_c" value="1" id="en_c_1">
+                </label>
+                <label for="en_c_2">
+                    Groupe 2
+                    <input type="radio" name="en_c" value="2" id="en_c_2">
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Autre</legend>
+                <label for="oth_16">
+                    Horaire aménagé (16h)
+                    <input type="checkbox" name="oth_16" id="oth_16" value="true">
+                </label>
+            </fieldset>
+            <div class="form__buttons">
+                <button type="button" id="resetForm">Reset</button>
+                <button type="button" id="ok">Valider</button>
+            </div>
+        </form>
+    </main>
+    </body>
+    
+    </html>

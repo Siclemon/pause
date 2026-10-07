@@ -37,23 +37,23 @@ body {
 
 @keyframes bg {
     0% {
-        background: oklch(10% 0.05 336);
+        background-color: oklch(10% 0.05 336);
     }
 
     25% {
-        background: oklch(10% 0.05 264);
+        background-color: oklch(10% 0.05 264);
     }
 
     50% {
-        background: oklch(10% 0.05 150);
+        background-color: oklch(10% 0.05 150);
     }
 
     75% {
-        background: oklch(10% 0.05 108);
+        background-color: oklch(10% 0.05 108);
     }
 
     100% {
-        background: oklch(10% 0.05 20);
+        background-color: oklch(10% 0.05 20);
         ;
     }
 }
@@ -100,19 +100,142 @@ body {
     }
 }
 
-form {
-    width: clamp();
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.opt__main {
+    width: clamp(330px, 70vw, 1100px);
+    margin: auto;
 
-    fieldset {
-        border-radius: 3px;
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 45px;
+    }
+
+    a {
+        color: oklch(98% 0.02 80);
+        text-decoration: none;
+        position: absolute;
+        top: 20px;
+        margin-left: 10px;
+        ;
+        font-size: 1.2rem;
+        font-style: italic;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        text-decoration-color: beige;
+        background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+        color: transparent;
+        background-clip: text;
+        animation: textAnim 8s infinite alternate ease-in-out;
+        background-size: 600% auto;
+    }
+
+    form {
         display: flex;
         flex-direction: column;
+        gap: 10px;
 
-        legend {
-            font-size: 1.2rem;
+        fieldset {
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+
+            legend {
+                font-size: 1.2rem;
+                background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+                color: transparent;
+                background-clip: text;
+                animation: textAnim 8s infinite alternate ease-in-out;
+                background-size: 600% auto;
+            }
+
+            label {
+                display: flex;
+                gap: 5px;
+                input {
+                    order: -1;
+                }
+                input[type='checkbox'] {
+                    border: 5px blue solid;
+                }
+            }
+        }
+
+        .form__buttons {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+
+            button {
+                height: 2.4rem;
+                border-radius: 10px;
+                border: none;
+                font-family: "Comic Sans MS";
+                font-size: 1.3rem;
+                /* width: 50%; */
+                justify-self: stretch;
+                cursor: pointer;
+            }
+
+            #resetForm {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                position: relative;
+                box-sizing: border-box;
+
+                animation: bg 8s infinite alternate ease-in-out;
+                background-clip: padding-box;
+                border: solid 3px transparent;
+
+            }
+
+            #resetForm::after {
+                background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+                color: transparent;
+                animation: textAnim 8s infinite alternate ease-in-out;
+                background-size: 600% auto;
+                background-clip: text;
+                content: "Reset";
+                pointer-events: none;
+                height: 105%;
+                border-radius: inherit;
+                position: absolute;
+            }
+
+            #resetForm::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: -1;
+                margin: -3px;
+                border-radius: inherit;
+                background: linear-gradient(to right, red, orange);
+                background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+                animation: textAnim 8s infinite alternate ease-in-out;
+                background-size: 600% auto;
+            }
+
+            #ok {
+                background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+                animation: textAnim 8s infinite alternate ease-in-out;
+                background-size: 600% auto;
+                color: oklch(10% 0 0);
+            }
+
+            #ok:hover {
+                filter: brightness(1.2);
+            }
+
+            #resetForm:hover #resetForm::after {
+                filter: brightness(3);
+            }
         }
     }
 }
