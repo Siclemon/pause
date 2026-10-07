@@ -68,13 +68,17 @@ function toDateFormat(time) {
 }
 
 function getNextBreak(breaks) {
-    let next = Infinity;
-    const now = (new Date()).getTime();
+    console.log("ofedc")
+    let next = new Date(3000,1,1,1);
+    let nextKey;
+    const now = new Date();
     for (const b in breaks) {
-        if (breaks[b].getTime() < next && breaks[b].getTime() > now)
-            next = b;
+        if (breaks[b] < next && breaks[b] > now) {
+            next = breaks[b];
+            nextKey = b;
+        }
     }
-    return next;
+    return nextKey;
 }
 
 async function timerOLD(nxt) {
@@ -100,8 +104,14 @@ async function timer(nxt) {
             else
                 break;
         }
+        if (diff <= 0) breakAlert();
         await new Promise(r => setTimeout(r, 1));
     }
+}
+
+function breakAlert() {
+    document.body.classList.remove("bg-alert");
+    document.body.classList.add("bg-alert");
 }
 
 

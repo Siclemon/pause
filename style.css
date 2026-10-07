@@ -58,6 +58,19 @@ body {
     }
 }
 
+.bg-alert {
+    animation: bg-alert 0.2s 50 forwards;
+}
+
+@keyframes bg-alert {
+    0% {
+        background-color: #fff;
+    }
+    100% {
+        background-color: #000;
+    }
+}
+
 .options__button {
     position: absolute;
     top: 10px;
@@ -122,8 +135,6 @@ body {
     }
 
     a:hover {
-        text-decoration: underline;
-        text-decoration-color: beige;
         background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
         color: transparent;
         background-clip: text;
