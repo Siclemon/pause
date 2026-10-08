@@ -68,7 +68,7 @@ function toDateFormat(time) {
 }
 
 function getNextBreak(breaks) {
-    const timerMode = settings.general.timer;
+    const timerMode = settings.general ? settings.general.timer : "all";
     let next = new Date(3000, 1, 1, 1);
     let nextKey;
     const now = new Date();
@@ -78,7 +78,7 @@ function getNextBreak(breaks) {
             nextKey = b;
         }
     }
-    if (settings.display.break_name) updateLabel(nextKey);
+    if (settings.general && settings.display.break_name) updateLabel(nextKey);
     return nextKey;
 }
 
