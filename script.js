@@ -1,4 +1,4 @@
-const settings = JSON.parse(localStorage.getItem("settings")) ?? null;
+const settings = JSON.parse(localStorage.getItem("settings")) ?? { schedule: {}, general: {}, display: {} };
 
 async function init() {
     const response = await fetch("./schedule.json");
@@ -18,7 +18,6 @@ async function init() {
 }
 
 function applySchSettings(schedule) {
-    if (settings == null) return schedule;
     const settingsSchedule = settings.schedule;
     if (settingsSchedule == null) return schedule;
 
