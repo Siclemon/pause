@@ -2,6 +2,9 @@ body {
     font-family: "Comic sans MS", cursive;
     animation: bg 8s infinite alternate ease-in-out;
     color: oklch(98% 0.02 80);
+}
+
+.index__body {
     overflow: hidden;
 }
 
