@@ -1,5 +1,10 @@
+@font-face {
+    font-family: "comic";
+    src: url(./assets/fonts/ComicSansMS3.ttf);
+}
+
 body {
-    font-family: "Comic sans MS", cursive;
+    font-family: "comic", sans-serif;
     animation: bg 8s infinite alternate ease-in-out;
     color: oklch(98% 0.02 80);
 }
@@ -195,7 +200,7 @@ body {
                 height: 2.4rem;
                 border-radius: 10px;
                 border: none;
-                font-family: "Comic Sans MS";
+                font-family: "comic", sans-serif;
                 font-size: 1.3rem;
                 /* width: 50%; */
                 justify-self: stretch;
