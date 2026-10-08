@@ -18,8 +18,9 @@ async function init() {
 }
 
 function applySchSettings(schedule) {
-    const settingsSchedule = settings.schedule
-    if (settingsSchedule == null) return schedule
+    if (settings == null) return schedule;
+    const settingsSchedule = settings.schedule;
+    if (settingsSchedule == null) return schedule;
 
     for (const setting in settingsSchedule) {
         switch (setting) {
