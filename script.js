@@ -1,9 +1,10 @@
+const settings = JSON.parse(localStorage.getItem("settings")) ?? null;
 
 async function init() {
     const response = await fetch("./schedule.json");
     let schedule = await response.json();
 
-    schedule = applySettings(schedule);
+    schedule = applySchSettings(schedule);
 
     const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
     const today = days[(new Date()).getDay()];
@@ -16,12 +17,11 @@ async function init() {
     return todayBreaks;
 }
 
-function applySettings(schedule) {
-    let settings = localStorage.getItem("settings") ?? null;
-    if (settings == null) return schedule
-    settings = JSON.parse(settings);
+function applySchSettings(schedule) {
+    const settingsSchedule = settings.schedule
+    if (settingsSchedule == null) return schedule
 
-    for (const setting in settings) {
+    for (const setting in settingsSchedule) {
         switch (setting) {
             case "sp_mon":
                 schedule.lundi.sport = "16:00";
@@ -30,7 +30,7 @@ function applySettings(schedule) {
                 schedule.mercredi.sport = "16:00";
                 break;
             case "oth_16":
-                for (const day in schedule) schedule[day].fin = "16:00";
+                for (const day in schedule) schedule[day].fin = day != "vendredi" ? "16:00" : schedule[day].fin;
                 break;
             case "en_n":
                 switch (settings.en_n) {
@@ -55,8 +55,8 @@ function applySettings(schedule) {
                 break;
         }
     }
-    console.log(schedule)
-    return schedule
+    console.log(schedule);
+    return schedule;
 }
 
 function toDateFormat(time) {
@@ -68,17 +68,24 @@ function toDateFormat(time) {
 }
 
 function getNextBreak(breaks) {
-    console.log("ofedc")
-    let next = new Date(3000,1,1,1);
+    const timerMode = settings.general.timer;
+    let next = new Date(3000, 1, 1, 1);
     let nextKey;
     const now = new Date();
     for (const b in breaks) {
-        if (breaks[b] < next && breaks[b] > now) {
+        if (breaks[b] < next && breaks[b] > now && (timerMode == "all" || timerMode == "brk" && b.startsWith("pause") || b == "fin")) {
             next = breaks[b];
             nextKey = b;
         }
     }
+    if (settings.display.break_name) updateLabel(nextKey);
     return nextKey;
+}
+
+function updateLabel(id) {
+    const label = document.querySelector(".timer__label");
+    const name = getBreakLabel(id)
+    label.textContent = name.charAt(0) + name.slice(1).toLowerCase();
 }
 
 async function timerOLD(nxt) {
@@ -91,11 +98,13 @@ async function timerOLD(nxt) {
     }
 }
 
-async function timer(nxt) {
+async function timer(todayBreaks) {
     const digits = document.querySelectorAll(".digit");
+    let nextBreakId = getNextBreak(todayBreaks);
+    let nextBreak = todayBreaks[nextBreakId];
 
     while (true) {
-        const diff = nxt - new Date();
+        const diff = nextBreak - new Date();
         let heure = format(diff);
         heure = heure.replaceAll(":", "");
         for (let i = 5; i >= 0; i--) {
@@ -104,16 +113,66 @@ async function timer(nxt) {
             else
                 break;
         }
-        if (diff <= 0) breakAlert();
+        if (diff <= 0) {
+            await breakAlert(nextBreakId);
+            nextBreak = todayBreaks[getNextBreak(todayBreaks)];
+            // const diff2 = nextBreak - new Date();
+            // let heure = format(diff2);
+            // heure = heure.replaceAll(":", "");
+            // for (let i = 5; i >= 0; i--) {
+            //     digits[i].textContent = heure.substring(i, i + 1);
+            // }
+            digits.forEach(d => d.textContent = "")
+        }
         await new Promise(r => setTimeout(r, 1));
     }
 }
 
-function breakAlert() {
+async function breakAlert(id) {
+    if (settings.general.blinking) bgBlinking();
+    displayBreakLabel(id);
+    await new Promise(r => setTimeout(r, 30000));
+    restoreTimerDisplay();
+}
+
+function bgBlinking() {
     document.body.classList.remove("bg-alert");
     document.body.classList.add("bg-alert");
 }
 
+function displayBreakLabel(id) {
+    const displaySpans = document.querySelectorAll(".display");
+    const displayDiv = document.querySelector(".divsplay");
+    displaySpans.forEach(s => s.style.display = "none");
+    const txt = document.createElement("span");
+    txt.id = "breakLabel";
+    txt.textContent = getBreakLabel(id);
+    displayDiv.appendChild(txt);
+}
+
+function restoreTimerDisplay() {
+    const displaySpans = document.querySelectorAll(".display");
+    const displayDiv = document.querySelector(".divsplay");
+    const txt = document.getElementById("breakLabel");
+    displaySpans.forEach(s => s.style.display = "inline");
+    displayDiv.removeChild(txt);
+}
+
+function getBreakLabel(id) {
+    switch (id) {
+        case "pauseMatin":
+        case "pauseAprem":
+            return "PAUSE";
+        case "anglais":
+            return "ANGLAIS";
+        case "sport":
+            return "SPORT";
+        case "fin":
+            return "FIN";
+        case "pauseRepas":
+            return "REPAS;"
+    }
+}
 
 function format(time) {
     time /= 1000;
@@ -130,14 +189,13 @@ function format(time) {
 
     return ftime.h + ":" + ftime.m + ":" + ftime.s;
     // + "." + String(String(time).slice(-3, -1)).padStart(2, "0")
-
 }
 
 async function main() {
     const todayBreaks = await init();
     let nextBreak = getNextBreak(todayBreaks);
 
-    timer(todayBreaks[nextBreak]);
+    timer(todayBreaks);
 }
 
 main();

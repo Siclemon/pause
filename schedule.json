@@ -1,25 +1,25 @@
 {
     "lundi": {
         "pauseMatin": "10:15",
-        "repas": "12:15",
+        "pauseRepas": "12:15",
         "pauseAprem": "15:00",
         "fin": "17:00"
     },
     "mardi": {
         "pauseMatin": "10:15",
-        "repas": "12:15",
+        "pauseRepas": "12:15",
         "pauseAprem": "15:00",
         "fin": "17:00"
     },
     "mercredi": {
         "pauseMatin": "10:15",
-        "repas": "12:15",
+        "pauseRepas": "12:15",
         "pauseAprem": "15:00",
         "fin": "17:00"
     },
     "jeudi": {
         "pauseMatin": "10:15",
-        "repas": "12:15",
+        "pauseRepas": "12:15",
         "pauseAprem": "15:00",
         "fin": "17:00"
     },
