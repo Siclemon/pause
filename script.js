@@ -84,7 +84,7 @@ function getNextBreak(breaks) {
 
 function updateLabel(id) {
     const label = document.querySelector(".timer__label");
-    const name = getBreakLabel(id)
+    const name = getBreakLabel(id);
     label.textContent = name.charAt(0) + name.slice(1).toLowerCase();
 }
 
@@ -116,13 +116,7 @@ async function timer(todayBreaks) {
         if (diff <= 0) {
             await breakAlert(nextBreakId);
             nextBreak = todayBreaks[getNextBreak(todayBreaks)];
-            // const diff2 = nextBreak - new Date();
-            // let heure = format(diff2);
-            // heure = heure.replaceAll(":", "");
-            // for (let i = 5; i >= 0; i--) {
-            //     digits[i].textContent = heure.substring(i, i + 1);
-            // }
-            digits.forEach(d => d.textContent = "")
+            digits.forEach(d => d.textContent = "");
         }
         await new Promise(r => setTimeout(r, 1));
     }
@@ -170,7 +164,9 @@ function getBreakLabel(id) {
         case "fin":
             return "FIN";
         case "pauseRepas":
-            return "REPAS;"
+            return "REPAS";
+        default: 
+            return "unidentified";
     }
 }
 
@@ -193,7 +189,6 @@ function format(time) {
 
 async function main() {
     const todayBreaks = await init();
-    let nextBreak = getNextBreak(todayBreaks);
 
     timer(todayBreaks);
 }
