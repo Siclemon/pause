@@ -129,7 +129,7 @@ async function timer(todayBreaks) {
 }
 
 async function breakAlert(id) {
-    if (settings.general.blinking) bgBlinking();
+    if (settings.display && settings.display.blinking) bgBlinking();
     displayBreakLabel(id);
     await new Promise(r => setTimeout(r, 30000));
     restoreTimerDisplay();
