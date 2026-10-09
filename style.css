@@ -271,3 +271,9 @@ body {
 .not_working {
     text-decoration: line-through;
 }
+
+@media (max-width:768px) {
+    .divsplay {
+        font-size: 5rem;
+    }
+}
