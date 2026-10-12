@@ -1,3 +1,7 @@
+:root {
+    --txt-color: oklch(98% 0.02 80);
+}
+
 @font-face {
     font-family: "comic";
     src: url(./assets/fonts/ComicSansMS3.ttf);
@@ -6,7 +10,7 @@
 body {
     font-family: "comic", sans-serif;
     animation: bg 8s infinite alternate ease-in-out;
-    color: oklch(98% 0.02 80);
+    color: var(--txt-color);
 }
 
 .index__body {
@@ -83,6 +87,7 @@ body {
     0% {
         background-color: #eee;
     }
+
     100% {
         background-color: #111;
     }
@@ -137,16 +142,15 @@ body {
     h1 {
         text-align: center;
         font-size: 2.5rem;
-        margin-bottom: 45px;
+        margin-bottom: 40px;
     }
 
     a {
-        color: oklch(98% 0.02 80);
+        color: var(--txt-color);
         text-decoration: none;
         position: absolute;
         top: 20px;
         margin-left: 10px;
-        ;
         font-size: 1.2rem;
         font-style: italic;
     }
@@ -164,29 +168,98 @@ body {
         flex-direction: column;
         gap: 10px;
 
+        &>fieldset {
+            padding: 3px 20px 8px;
+        }
+
         fieldset {
-            border-radius: 3px;
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
 
+            &:not(:has(fieldset)) {
+                border-radius: 8px;
+            }
+
             legend {
-                font-size: 1.2rem;
+                font-size: 1.25rem;
                 background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
                 color: transparent;
                 background-clip: text;
                 animation: textAnim 8s infinite alternate ease-in-out;
                 background-size: 600% auto;
+                margin: 0 auto;
+            }
+
+            fieldset {
+                margin-bottom: 5px;
+                margin-top: -3px;
+                border: 2px solid oklch(98% 0.02 80 / 0.5);
+
+                legend {
+                    font-size: 1.1rem;
+                    margin: 0;
+                }
             }
 
             label {
                 display: flex;
+                flex-wrap: wrap;
                 gap: 5px;
+
                 input {
                     order: -1;
+
+                    appearance: none;
+                    border: 1px solid var(--txt-color);
+                    width: 1.2em;
+                    height: 1.2em;
+                    display: grid;
+                    place-items: center;
                 }
+
                 input[type='checkbox'] {
-                    border: 5px blue solid;
+                    border-radius: 4px;
                 }
+
+                input[type='radio'] {
+                    border-radius: 50%;
+                }
+
+                input::before {
+                    content: "";
+                    display: block;
+                    position: absolute;
+                    height: 1.1em;
+                    width: 1.1em;
+                    scale: 0;
+                    border-radius: inherit;
+                    background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+                    animation: textAnim 8s infinite alternate ease-in-out;
+                    background-size: 600% auto;
+                    transition: 0.1s ease-in-out;
+                }
+
+                input:checked::before {
+                    border: 1px solid var(--txt-color);
+                    scale: 1;
+                }
+            }
+
+            label:hover {
+                text-decoration: underline;
+            }
+
+        }
+
+        fieldset:hover:not(:has(fieldset:hover)) {
+            background-image: linear-gradient(110deg, oklch(25% 0.30 336), oklch(25% 0.3 264), oklch(25% 0.19 150), oklch(25% 0.20 108), oklch(25% 0.3 20));
+            animation: textAnim 4s infinite alternate ease-in-out;
+            background-size: 600% auto;
+            background: #fff2;
+
+            fieldset {
+                animation: bg 8s infinite alternate ease-in-out;
             }
         }
 
@@ -269,11 +342,15 @@ body {
 }
 
 .not_working {
-    text-decoration: line-through;
+    text-decoration: line-through !important;
 }
 
 @media (max-width:768px) {
     .divsplay {
         font-size: 5rem;
+    }
+
+    form>fieldset {
+        padding: 10px !important;
     }
 }
