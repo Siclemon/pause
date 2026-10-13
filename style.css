@@ -93,7 +93,7 @@ body {
     }
 }
 
-.options__button {
+.options__button, #ttBtn {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -107,6 +107,8 @@ body {
         }
     }
 }
+
+#ttBtn {left:100px;}
 
 .options__button:hover {
     filter: drop-shadow(0 0 4px #fff8) drop-shadow(0 0 1px #fffa) brightness(1.5);

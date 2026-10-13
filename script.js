@@ -1,10 +1,13 @@
 const settings = JSON.parse(localStorage.getItem("settings")) ?? { schedule: {}, general: {}, display: {} };
+const timetableBtn = document.getElementById("ttBtn");
+const timetableDialog = document.getElementById("ttDialog");
 
 async function init() {
     const response = await fetch("./schedule.json");
     let schedule = await response.json();
 
     schedule = applySchSettings(schedule);
+    initTimetable(schedule);
 
     const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
     const today = days[(new Date()).getDay()];
@@ -22,6 +25,7 @@ function applySchSettings(schedule) {
     if (settingsSchedule == null) return schedule;
 
     for (const setting in settingsSchedule) {
+        console.log(setting)
         switch (setting) {
             case "sp_mon":
                 schedule.lundi.sport = "16:00";
@@ -33,7 +37,7 @@ function applySchSettings(schedule) {
                 for (const day in schedule) schedule[day].fin = day != "vendredi" ? "16:00" : schedule[day].fin;
                 break;
             case "en_n":
-                switch (settings.en_n) {
+                switch (settingsSchedule.en_n) {
                     case "1":
                         schedule.mardi.anglais = "14:00";
                         break;
@@ -44,7 +48,7 @@ function applySchSettings(schedule) {
                 }
                 break;
             case "en_c":
-                switch (settings.en_c) {
+                switch (settingsSchedule.en_c) {
                     case "1":
                         schedule.jeudi.anglais = "08:30";
                         break;
@@ -165,7 +169,7 @@ function getBreakLabel(id) {
             return "FIN";
         case "pauseRepas":
             return "REPAS";
-        default: 
+        default:
             return "unidentified";
     }
 }
@@ -192,5 +196,60 @@ async function main() {
 
     timer(todayBreaks);
 }
+
+timetableBtn.addEventListener('click', () => timetableDialog.showModal());
+
+function initTimetable(sch) {
+    console.log(sch)
+    for (const d in sch) {
+        console.log(d)
+        for (const e in sch[d])
+            console.log(sch[d][e] + " --- " + e)
+        console.log(sch[d])
+    }
+    "hjeccql".split
+
+
+    const tt = formatTt(sch);
+    console.log(tt)
+}
+
+function formatTt(sch) {
+    const arr = [];
+
+    for (const d in sch) {
+        console.log(d)
+        const day = [];
+        for (const e in sch[d]) {
+            console.log(sch[d][e] + " --- " + e)
+            const p = {};
+            p.name = e;
+            p.start = sch[d][e].replaceAll(":","");
+            day.push(p);
+        }
+        day.sort((a, b) => a.start - b.start);
+
+        for (const i in day) {
+            if (i == day.length - 1) {
+                day[i].duration = calcDuration(day[i].start, 1700)
+            } else {
+                day[i].duration = calcDuration(day[i].start, day[i+1].start)
+            }
+        }
+
+        arr.push(day);
+    }
+
+    return arr;
+}
+
+function calcDuration(a, b) {
+    let d;
+
+    return d;
+}
+
+initTimetable();
+
 
 main();
