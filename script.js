@@ -250,6 +250,7 @@ function createTable(tt) {
                 cell.rowSpan = item.duration;
                 cell.classList.add(item.name || "main");
                 if (d < todayIndex) cell.classList.add("past");
+                if (d == todayIndex && isInPast(day.dur)) cell.classList.add("past");
                 daysIndices[d].index++;
                 daysIndices[d].dur += item.duration;
             }
@@ -257,7 +258,6 @@ function createTable(tt) {
     }
     console.log(tt)
     console.log(todayIndex)
-    isInPast()
 }
 
 function isInPast(duration) {
@@ -265,8 +265,10 @@ function isInPast(duration) {
     const regex = /^(\d{2}):(\d{2})/;
     now = now.match(regex).slice(1).join("");
     console.error(now)
-    const nowDuration = (now - 800)/15;
-    console.log(nowDuration)
+    const nowDuration = to15MinIntervals(now - 800);
+    console.error(nowDuration)
+    console.error(nowDuration + " - "+duration)
+    return duration <= nowDuration;
 }
 
 function formatTt(sch) {
