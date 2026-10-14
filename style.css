@@ -93,7 +93,8 @@ body {
     }
 }
 
-.options__button, #ttBtn {
+.options__button,
+#ttBtn {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -108,7 +109,9 @@ body {
     }
 }
 
-#ttBtn {left:100px;}
+#ttBtn {
+    left: 100px;
+}
 
 .options__button:hover {
     filter: drop-shadow(0 0 4px #fff8) drop-shadow(0 0 1px #fffa) brightness(1.5);
@@ -340,6 +343,48 @@ body {
                 filter: brightness(3);
             }
         }
+    }
+}
+
+table {
+    color: var(--txt-color);
+    background: var(--txt-color);
+    text-shadow: 1px 1px 0 #0008, -1px 1px 0 #0008, 1px -1px 0 #0008, -1px -1px 0 #0008;
+    letter-spacing: 0.5px;
+    font-size: 1.05rem;
+    
+    thead {
+        animation: bg 8s alternate infinite ease-in-out;
+        text-transform: uppercase;
+    }
+    
+    tr {
+        height: 1em;
+    }
+    
+    td {
+        width: 16ch;
+        text-align: center;
+        border-radius: 8px;
+    }
+    
+    .pauseMatin, .pauseAprem {
+        background: oklch(60% .15 140);
+    }
+    .pauseRepas {
+        background: oklch(60% .15 20);
+    }
+    .sport {
+        background: oklch(60% .15 280);
+    }
+    .anglais {
+        background: oklch(75% .15 75);
+    }
+    .main {
+        background: oklch(60% .15 200);
+    }
+    .past {
+        filter: saturate(0.25);
     }
 }
 

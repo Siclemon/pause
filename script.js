@@ -88,8 +88,7 @@ function getNextBreak(breaks) {
 
 function updateLabel(id) {
     const label = document.querySelector(".timer__label");
-    const name = getBreakLabel(id);
-    label.textContent = name.charAt(0) + name.slice(1).toLowerCase();
+    label.textContent = getBreakLabel(id, false)
 }
 
 async function timerOLD(nxt) {
@@ -144,7 +143,7 @@ function displayBreakLabel(id) {
     displaySpans.forEach(s => s.style.display = "none");
     const txt = document.createElement("span");
     txt.id = "breakLabel";
-    txt.textContent = getBreakLabel(id);
+    txt.textContent = getBreakLabel(id, true);
     displayDiv.appendChild(txt);
 }
 
@@ -156,22 +155,29 @@ function restoreTimerDisplay() {
     displayDiv.removeChild(txt);
 }
 
-function getBreakLabel(id) {
+function getBreakLabel(id, uppercase) {
+    let ret;
     switch (id) {
         case "pauseMatin":
         case "pauseAprem":
-            return "PAUSE";
+            ret = "Pause";
+            break;
         case "anglais":
-            return "ANGLAIS";
+            ret = "Anglais";
+            break;
         case "sport":
-            return "SPORT";
+            ret = "Sport";
+            break;
         case "fin":
-            return "FIN";
+            ret = "Fin";
+            break;
         case "pauseRepas":
-            return "REPAS";
+            ret = "Repas";
+            break;
         default:
-            return "unidentified";
+            return "";
     }
+    return uppercase ? ret.toUpperCase() : ret;
 }
 
 function format(time) {
@@ -211,7 +217,56 @@ function initTimetable(sch) {
 
 
     const tt = formatTt(sch);
+    console.log(tt);
+
+    createTable(tt);
+}
+
+function createTable(tt) {
+    const table = document.querySelector("tbody");
+    const todayIndex = (new Date()).getDay() - 1;
+
+    // const daysIndices = [0, 0, 0, 0, 0];
+    const daysIndices = [];
+    for (let i = 0; i < 5; i++) daysIndices.push({ index: 0, dur: 0 });
+    for (let i = 0; i < 36; i++) {
+        table.insertRow(i);
+    }
+    const rows = table.childNodes;
+
+    const maxRow = settings.schedule && settings.schedule.oth_16 ? 32 : 36;
+    for (let i = 0; i < maxRow; i++) {
+        const row = rows[i];
+        for (const d in tt) {
+            const day = daysIndices[d];
+            console.log(day)
+            console.log("d : " + d + "\ti : " + i + "\tdi : " + day.index + "\tdd : " + daysIndices[d].dur)
+            if (i == daysIndices[d].dur && tt[d].length > day.index) {
+                if (tt[d][day.index].duration == 0) { daysIndices[d].index++; continue; } //skip perdiods with no duration
+
+                const item = tt[d][day.index];
+                const cell = row.insertCell();
+                cell.textContent = getBreakLabel(item.name, false);
+                cell.rowSpan = item.duration;
+                cell.classList.add(item.name || "main");
+                if (d < todayIndex) cell.classList.add("past");
+                daysIndices[d].index++;
+                daysIndices[d].dur += item.duration;
+            }
+        }
+    }
     console.log(tt)
+    console.log(todayIndex)
+    isInPast()
+}
+
+function isInPast(duration) {
+    let now = (new Date()).toTimeString();
+    const regex = /^(\d{2}):(\d{2})/;
+    now = now.match(regex).slice(1).join("");
+    console.error(now)
+    const nowDuration = (now - 800)/15;
+    console.log(nowDuration)
 }
 
 function formatTt(sch) {
@@ -224,32 +279,67 @@ function formatTt(sch) {
             console.log(sch[d][e] + " --- " + e)
             const p = {};
             p.name = e;
-            p.start = sch[d][e].replaceAll(":","");
+            p.start = sch[d][e].replaceAll(":", "");
             day.push(p);
         }
         day.sort((a, b) => a.start - b.start);
 
-        for (const i in day) {
-            if (i == day.length - 1) {
-                day[i].duration = calcDuration(day[i].start, 1700)
-            } else {
-                day[i].duration = calcDuration(day[i].start, day[i+1].start)
-            }
-        }
+        let fullDay = day.flatMap((p, i, a) =>
+            a[i - 1] && a[i - 1].name == "sport"
+                ? p
+                : [{
+                    name: "",
+                    start: i == 0
+                        ? "0800"
+                        : (() => {
+                            console.log(p)
+                            switch (a[i - 1].name) {
+                                case "pauseMatin":
+                                case "pauseAprem":
+                                    return parseInt(a[i - 1].start) + 15;
+                                case "pauseRepas":
+                                    return parseInt(a[i - 1].start) + 100;
+                                case "anglais":
+                                    return d == "mardi" ? parseInt(a[i - 1].start) + 100 : parseInt(a[i - 1].start) + 170;
+                                case "sport":
+                                    return 1600;
+                            }
+                        })()
+                },
+                    p
+                ]
+        );
+        console.log(d.toUpperCase())
+        console.log(fullDay)
 
-        arr.push(day);
+        for (let i = 0; i < fullDay.length - 1; i++) {
+            fullDay[i].duration = calcDuration(fullDay[i].start, fullDay[i + 1].start);
+            delete fullDay[i].start;
+        }
+        fullDay.pop();
+        fullDay = fullDay.filter((p) => p.duration != 0);
+        arr.push(fullDay);
     }
+    console.log(arr)
 
     return arr;
 }
 
 function calcDuration(a, b) {
-    let d;
+    a = to15MinIntervals(a);
+    b = to15MinIntervals(b);
 
-    return d;
+    return b - a;
 }
 
-initTimetable();
+function to15MinIntervals(t) {
+    const h = Math.floor(t / 100);
+    let m = t % 100;
+    m += h * 60;
+    return m / 15;
+}
+
+// initTimetable();
 
 
 main();
