@@ -386,6 +386,11 @@ table {
     .past {
         filter: saturate(0.25);
     }
+    .now {
+        background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+        animation: textAnim 8s infinite alternate ease-in-out;
+        background-size: 600% auto;
+    }
 }
 
 .not_working {
