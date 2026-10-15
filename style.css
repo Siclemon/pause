@@ -463,4 +463,14 @@ dialog::backdrop {
     form>fieldset {
         padding: 10px !important;
     }
+
+    dialog table {
+        font-size: 0.85rem;
+        thead {
+            font-size: 0.8rem;
+        }
+        td {
+            width: 12ch;
+        }
+    }
 }
