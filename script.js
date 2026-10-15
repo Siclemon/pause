@@ -25,7 +25,6 @@ function applySchSettings(schedule) {
     if (settingsSchedule == null) return schedule;
 
     for (const setting in settingsSchedule) {
-        console.log(setting)
         switch (setting) {
             case "sp_mon":
                 schedule.lundi.sport = "16:00";
@@ -59,7 +58,7 @@ function applySchSettings(schedule) {
                 break;
         }
     }
-    console.log(schedule);
+
     return schedule;
 }
 
@@ -91,15 +90,14 @@ function updateLabel(id) {
     label.textContent = getBreakLabel(id, false)
 }
 
-async function timerOLD(nxt) {
-    const display = document.getElementById("display");
-
-    while (true) {
-        const diff = nxt - new Date();
-        display.textContent = format(diff);
-        await new Promise(r => setTimeout(r, 50));
-    }
-}
+// async function timerOLD(nxt) {
+//     const display = document.getElementById("display");
+//     while (true) {
+//         const diff = nxt - new Date();
+//         display.textContent = format(diff);
+//         await new Promise(r => setTimeout(r, 50));
+//     }
+// }
 
 async function timer(todayBreaks) {
     const digits = document.querySelectorAll(".digit");
@@ -203,89 +201,82 @@ async function main() {
     timer(todayBreaks);
 }
 
+// =============================== TIMETABLE ===============================
+
+// open
 timetableBtn.addEventListener('click', () => timetableDialog.showModal());
+// close
+timetableDialog.addEventListener('click', (event) => {
+    if (event.target.contains(timetableDialog)) {
+        timetableDialog.close();
+    }
+});
 
 function initTimetable(sch) {
-    console.log(sch)
-    for (const d in sch) {
-        console.log(d)
-        for (const e in sch[d])
-            console.log(sch[d][e] + " --- " + e)
-        console.log(sch[d])
-    }
-    "hjeccql".split
-
-
     const tt = formatTt(sch);
-    console.log(tt);
-
     createTable(tt);
 }
 
 function createTable(tt) {
     const table = document.querySelector("tbody");
     const todayIndex = (new Date()).getDay() - 1;
+    const maxRow = settings.schedule && settings.schedule.oth_16 ? 32 : 36;
 
-    // const daysIndices = [0, 0, 0, 0, 0];
+    // index=which period are we on; dur=when should start the next period
     const daysIndices = [];
     for (let i = 0; i < 5; i++) daysIndices.push({ index: 0, dur: 0 });
-    for (let i = 0; i < 36; i++) {
+    // create all tables rows
+    for (let i = 0; i < maxRow; i++) {
         table.insertRow(i);
     }
     const rows = table.childNodes;
 
-    const maxRow = settings.schedule && settings.schedule.oth_16 ? 32 : 36;
-    for (let i = 0; i < maxRow; i++) {
+    for (let i = 0; i < maxRow; i++) { //for each row
         const row = rows[i];
-        for (const d in tt) {
+        for (const d in tt) { // for each day
             const day = daysIndices[d];
-            console.log(day)
-            console.log("d : " + d + "\ti : " + i + "\tdi : " + day.index + "\tdd : " + daysIndices[d].dur)
-            if (i == daysIndices[d].dur && tt[d].length > day.index) {
-                if (tt[d][day.index].duration == 0) { daysIndices[d].index++; continue; } //skip perdiods with no duration
 
-                const item = tt[d][day.index];
+            if (i == daysIndices[d].dur && tt[d].length > day.index) { // should a new period start? are there still periods for the day?
+                const period = tt[d][day.index];
                 const cell = row.insertCell();
-                cell.textContent = getBreakLabel(item.name, false);
-                cell.rowSpan = item.duration;
-                cell.classList.add(item.name || "main");
-                if (d < todayIndex) cell.classList.add("past");
-                if (d == todayIndex && isInPast(day.dur)) cell.classList.add("past");
+                cell.textContent = getBreakLabel(period.name, false);
+                cell.rowSpan = period.duration;
+                cell.classList.add(period.name || "main");
+
+                if (d < todayIndex || d == todayIndex && isInPast(day.dur + period.duration)) cell.classList.add("past");
+                if (d == todayIndex && isInPast(day.dur) && !isInPast(day.dur + period.duration)) cell.classList.add("now");
+
                 daysIndices[d].index++;
-                daysIndices[d].dur += item.duration;
+                daysIndices[d].dur += period.duration;
             }
+            // style for today's header
+            if (d == todayIndex) document.querySelectorAll("thead th")[d].classList.add("today");
         }
     }
-    console.log(tt)
-    console.log(todayIndex)
 }
 
 function isInPast(duration) {
     let now = (new Date()).toTimeString();
     const regex = /^(\d{2}):(\d{2})/;
     now = now.match(regex).slice(1).join("");
-    console.error(now)
     const nowDuration = to15MinIntervals(now - 800);
-    console.error(nowDuration)
-    console.error(nowDuration + " - "+duration)
     return duration <= nowDuration;
 }
 
 function formatTt(sch) {
     const arr = [];
 
-    for (const d in sch) {
-        console.log(d)
+    for (const d in sch) { // for each day
         const day = [];
-        for (const e in sch[d]) {
-            console.log(sch[d][e] + " --- " + e)
+        for (const e in sch[d]) { // for each item, create period item with name and start time
             const p = {};
             p.name = e;
             p.start = sch[d][e].replaceAll(":", "");
             day.push(p);
         }
-        day.sort((a, b) => a.start - b.start);
+        day.sort((a, b) => a.start - b.start); // sort the day's items depending on the start time
 
+        // insert basic periods between all nonconsecutive periods
         let fullDay = day.flatMap((p, i, a) =>
             a[i - 1] && a[i - 1].name == "sport"
                 ? p
@@ -294,7 +285,6 @@ function formatTt(sch) {
                     start: i == 0
                         ? "0800"
                         : (() => {
-                            console.log(p)
                             switch (a[i - 1].name) {
                                 case "pauseMatin":
                                 case "pauseAprem":
@@ -311,18 +301,16 @@ function formatTt(sch) {
                     p
                 ]
         );
-        console.log(d.toUpperCase())
-        console.log(fullDay)
 
+        // calc the duration of each period
         for (let i = 0; i < fullDay.length - 1; i++) {
             fullDay[i].duration = calcDuration(fullDay[i].start, fullDay[i + 1].start);
             delete fullDay[i].start;
         }
-        fullDay.pop();
-        fullDay = fullDay.filter((p) => p.duration != 0);
+        fullDay.pop(); //remove the end
+        fullDay = fullDay.filter((p) => p.duration != 0); // remove the empty periods
         arr.push(fullDay);
     }
-    console.log(arr)
 
     return arr;
 }
@@ -340,8 +328,5 @@ function to15MinIntervals(t) {
     m += h * 60;
     return m / 15;
 }
-
-// initTimetable();
-
 
 main();

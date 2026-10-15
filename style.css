@@ -37,8 +37,13 @@ body {
     background-clip: text;
     animation: textAnim 8s infinite alternate ease-in-out;
     background-size: 600% auto;
-    /* text-shadow: -4px -2px #111f; */
     filter: drop-shadow(6px 3px 0 #000b);
+
+    .digit {
+        display: inline-block;
+        width: 1ch;
+        text-align: center;
+    }
 }
 
 .divsplay span::selection {
@@ -103,8 +108,25 @@ body {
         height: 80px;
         width: 80px;
 
-        path {
+        path,
+        line,
+        circle,
+        polyline {
             animation: opt 8s infinite alternate ease-in-out;
+        }
+    }
+}
+
+#ttBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    svg {
+        height: 75px;
+
+        * {
+            stroke-width: 5px;
         }
     }
 }
@@ -113,7 +135,8 @@ body {
     left: 100px;
 }
 
-.options__button:hover {
+.options__button:hover,
+#ttBtn:hover {
     filter: drop-shadow(0 0 4px #fff8) drop-shadow(0 0 1px #fffa) brightness(1.5);
 }
 
@@ -346,51 +369,86 @@ body {
     }
 }
 
-table {
-    color: var(--txt-color);
-    background: var(--txt-color);
-    text-shadow: 1px 1px 0 #0008, -1px 1px 0 #0008, 1px -1px 0 #0008, -1px -1px 0 #0008;
-    letter-spacing: 0.5px;
-    font-size: 1.05rem;
-    
-    thead {
-        animation: bg 8s alternate infinite ease-in-out;
-        text-transform: uppercase;
+dialog {
+    background: rgba(70, 67, 67, 0.48);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(7.8px);
+    border: 1px solid rgba(151, 143, 143, 0.24);
+    padding: 20px;
+
+    table {
+        color: var(--txt-color);
+        text-shadow: 1px 1px 0 #0008, -1px 1px 0 #0008, 1px -1px 0 #0008, -1px -1px 0 #0008;
+        letter-spacing: 0.5px;
+        font-size: 1.03rem;
+        border-spacing: 4px 2px;
+
+        thead {
+            text-transform: uppercase;
+            font-size: 1.07rem;
+
+            th {
+                animation: bg 8s alternate infinite ease-in-out;
+            }
+
+            .today span {
+                background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+                color: transparent;
+                background-clip: text;
+                animation: textAnim 8s infinite alternate ease-in-out;
+                background-size: 600% auto;
+                text-shadow: none;
+            }
+        }
+
+        tr {
+            height: 1em;
+        }
+
+        th,
+        td {
+            width: 16ch;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .pauseMatin,
+        .pauseAprem {
+            background: oklch(60% .18 140);
+        }
+
+        .pauseRepas {
+            background: oklch(60% .18 20);
+        }
+
+        .sport {
+            background: oklch(60% .18 280);
+        }
+
+        .anglais {
+            background: oklch(75% .18 75);
+        }
+
+        .main {
+            background: oklch(60% .18 200);
+        }
+
+        .past {
+            filter: saturate(0.1);
+        }
+
+        .now {
+            background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
+            animation: textAnim 8s infinite alternate ease-in-out;
+            background-size: 600% auto;
+        }
     }
-    
-    tr {
-        height: 1em;
-    }
-    
-    td {
-        width: 16ch;
-        text-align: center;
-        border-radius: 8px;
-    }
-    
-    .pauseMatin, .pauseAprem {
-        background: oklch(60% .15 140);
-    }
-    .pauseRepas {
-        background: oklch(60% .15 20);
-    }
-    .sport {
-        background: oklch(60% .15 280);
-    }
-    .anglais {
-        background: oklch(75% .15 75);
-    }
-    .main {
-        background: oklch(60% .15 200);
-    }
-    .past {
-        filter: saturate(0.25);
-    }
-    .now {
-        background-image: linear-gradient(110deg, oklch(75% 0.30 336), oklch(60% 0.3 264), oklch(75% 0.19 150), oklch(75% 0.20 108), oklch(75% 0.3 20));
-        animation: textAnim 8s infinite alternate ease-in-out;
-        background-size: 600% auto;
-    }
+}
+
+dialog::backdrop {
+    backdrop-filter: blur(1px);
+    background-color: oklch(5% 0 0 / 0.1);
 }
 
 .not_working {
