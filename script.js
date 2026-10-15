@@ -1,10 +1,13 @@
 const settings = JSON.parse(localStorage.getItem("settings")) ?? { schedule: {}, general: {}, display: {} };
+const timetableBtn = document.getElementById("ttBtn");
+const timetableDialog = document.getElementById("ttDialog");
 
 async function init() {
     const response = await fetch("./schedule.json");
     let schedule = await response.json();
 
     schedule = applySchSettings(schedule);
+    initTimetable(schedule);
 
     const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
     const today = days[(new Date()).getDay()];
@@ -33,7 +36,7 @@ function applySchSettings(schedule) {
                 for (const day in schedule) schedule[day].fin = day != "vendredi" ? "16:00" : schedule[day].fin;
                 break;
             case "en_n":
-                switch (settings.en_n) {
+                switch (settingsSchedule.en_n) {
                     case "1":
                         schedule.mardi.anglais = "14:00";
                         break;
@@ -44,7 +47,7 @@ function applySchSettings(schedule) {
                 }
                 break;
             case "en_c":
-                switch (settings.en_c) {
+                switch (settingsSchedule.en_c) {
                     case "1":
                         schedule.jeudi.anglais = "08:30";
                         break;
@@ -55,7 +58,7 @@ function applySchSettings(schedule) {
                 break;
         }
     }
-    console.log(schedule);
+
     return schedule;
 }
 
@@ -84,19 +87,17 @@ function getNextBreak(breaks) {
 
 function updateLabel(id) {
     const label = document.querySelector(".timer__label");
-    const name = getBreakLabel(id);
-    label.textContent = name.charAt(0) + name.slice(1).toLowerCase();
+    label.textContent = getBreakLabel(id, false)
 }
 
-async function timerOLD(nxt) {
-    const display = document.getElementById("display");
-
-    while (true) {
-        const diff = nxt - new Date();
-        display.textContent = format(diff);
-        await new Promise(r => setTimeout(r, 50));
-    }
-}
+// async function timerOLD(nxt) {
+//     const display = document.getElementById("display");
+//     while (true) {
+//         const diff = nxt - new Date();
+//         display.textContent = format(diff);
+//         await new Promise(r => setTimeout(r, 50));
+//     }
+// }
 
 async function timer(todayBreaks) {
     const digits = document.querySelectorAll(".digit");
@@ -140,7 +141,7 @@ function displayBreakLabel(id) {
     displaySpans.forEach(s => s.style.display = "none");
     const txt = document.createElement("span");
     txt.id = "breakLabel";
-    txt.textContent = getBreakLabel(id);
+    txt.textContent = getBreakLabel(id, true);
     displayDiv.appendChild(txt);
 }
 
@@ -152,22 +153,29 @@ function restoreTimerDisplay() {
     displayDiv.removeChild(txt);
 }
 
-function getBreakLabel(id) {
+function getBreakLabel(id, uppercase) {
+    let ret;
     switch (id) {
         case "pauseMatin":
         case "pauseAprem":
-            return "PAUSE";
+            ret = "Pause";
+            break;
         case "anglais":
-            return "ANGLAIS";
+            ret = "Anglais";
+            break;
         case "sport":
-            return "SPORT";
+            ret = "Sport";
+            break;
         case "fin":
-            return "FIN";
+            ret = "Fin";
+            break;
         case "pauseRepas":
-            return "REPAS";
-        default: 
-            return "unidentified";
+            ret = "Repas";
+            break;
+        default:
+            return "";
     }
+    return uppercase ? ret.toUpperCase() : ret;
 }
 
 function format(time) {
@@ -191,6 +199,134 @@ async function main() {
     const todayBreaks = await init();
 
     timer(todayBreaks);
+}
+
+// =============================== TIMETABLE ===============================
+
+// open
+timetableBtn.addEventListener('click', () => timetableDialog.showModal());
+// close
+timetableDialog.addEventListener('click', (event) => {
+    if (event.target.contains(timetableDialog)) {
+        timetableDialog.close();
+    }
+});
+
+function initTimetable(sch) {
+    const tt = formatTt(sch);
+    createTable(tt);
+}
+
+function createTable(tt) {
+    const table = document.querySelector("tbody");
+    const todayIndex = (new Date()).getDay() - 1;
+    const maxRow = settings.schedule && settings.schedule.oth_16 ? 32 : 36;
+
+    // index=which period are we on; dur=when should start the next period
+    const daysIndices = [];
+    for (let i = 0; i < 5; i++) daysIndices.push({ index: 0, dur: 0 });
+    // create all tables rows
+    for (let i = 0; i < maxRow; i++) {
+        table.insertRow(i);
+    }
+    const rows = table.childNodes;
+
+    for (let i = 0; i < maxRow; i++) { //for each row
+        const row = rows[i];
+        for (const d in tt) { // for each day
+            const day = daysIndices[d];
+
+            if (i == daysIndices[d].dur && tt[d].length > day.index) { // should a new period start? are there still periods for the day?
+                const period = tt[d][day.index];
+                const cell = row.insertCell();
+                cell.textContent = getBreakLabel(period.name, false);
+                cell.rowSpan = period.duration;
+                cell.classList.add(period.name || "main");
+
+                if (d < todayIndex || d == todayIndex && isInPast(day.dur + period.duration)) cell.classList.add("past");
+                if (d == todayIndex && isInPast(day.dur) && !isInPast(day.dur + period.duration)) cell.classList.add("now");
+
+                daysIndices[d].index++;
+                daysIndices[d].dur += period.duration;
+            }
+            // style for today's header
+            if (d == todayIndex) document.querySelectorAll("thead th")[d].classList.add("today");
+        }
+    }
+}
+
+function isInPast(duration) {
+    let now = (new Date()).toTimeString();
+    const regex = /^(\d{2}):(\d{2})/;
+    now = now.match(regex).slice(1).join("");
+    const nowDuration = to15MinIntervals(now - 800);
+    return duration <= nowDuration;
+}
+
+function formatTt(sch) {
+    const arr = [];
+
+    for (const d in sch) { // for each day
+        const day = [];
+        for (const e in sch[d]) { // for each item, create period item with name and start time
+            const p = {};
+            p.name = e;
+            p.start = sch[d][e].replaceAll(":", "");
+            day.push(p);
+        }
+        day.sort((a, b) => a.start - b.start); // sort the day's items depending on the start time
+
+        // insert basic periods between all nonconsecutive periods
+        let fullDay = day.flatMap((p, i, a) =>
+            a[i - 1] && a[i - 1].name == "sport"
+                ? p
+                : [{
+                    name: "",
+                    start: i == 0
+                        ? "0800"
+                        : (() => {
+                            switch (a[i - 1].name) {
+                                case "pauseMatin":
+                                case "pauseAprem":
+                                    return parseInt(a[i - 1].start) + 15;
+                                case "pauseRepas":
+                                    return parseInt(a[i - 1].start) + 100;
+                                case "anglais":
+                                    return d == "mardi" ? parseInt(a[i - 1].start) + 100 : parseInt(a[i - 1].start) + 170;
+                                case "sport":
+                                    return 1600;
+                            }
+                        })()
+                },
+                    p
+                ]
+        );
+
+        // calc the duration of each period
+        for (let i = 0; i < fullDay.length - 1; i++) {
+            fullDay[i].duration = calcDuration(fullDay[i].start, fullDay[i + 1].start);
+            delete fullDay[i].start;
+        }
+        fullDay.pop(); //remove the end
+        fullDay = fullDay.filter((p) => p.duration != 0); // remove the empty periods
+        arr.push(fullDay);
+    }
+
+    return arr;
+}
+
+function calcDuration(a, b) {
+    a = to15MinIntervals(a);
+    b = to15MinIntervals(b);
+
+    return b - a;
+}
+
+function to15MinIntervals(t) {
+    const h = Math.floor(t / 100);
+    let m = t % 100;
+    m += h * 60;
+    return m / 15;
 }
 
 main();
